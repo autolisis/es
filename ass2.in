@@ -1,0 +1,40 @@
+; Assignment 2
+
+FileName:	.asciz "string.txt"
+			.align
+FileError:	.asciz "Error opening file\n"
+			.align
+String:		.asciz "Hello world!\n"
+			.align
+
+Main:
+			ldr r0, =FileName
+			mov r1, #Fmode_r
+			swi SWI_Open
+			blcs PrintErr
+			bl ReadString
+			swi SWI_Close
+			swi SWI_Exit
+
+ReadString:	stmdb SP!, {r0-r2,lr}
+			bl Malloc
+			mov r2, #200
+			swi SWI_RdStr
+			bl DumpString
+			ldmia SP!, {r0-r2,pc}
+
+Malloc:		stmdb SP!, {r0,lr}
+			mov r0, #200
+			swi SWI_Malloc
+			mov r1, r0
+			ldmia SP!, {r0,pc}
+
+DumpString: stmdb SP!, {r0,lr}
+			mov r0,r1
+			swi SWI_PrStr
+			ldmia SP!, {r0,pc}
+
+PrintErr:	stmdb SP!, {r0,lr}
+			ldr r0, =FileError
+			swi SWI_PrStr
+			ldmia SP!, {r0,pc}

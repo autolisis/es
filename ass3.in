@@ -1,0 +1,62 @@
+; Assignment 3
+
+FileName:	.asciz "int.txt"
+			.align
+FileError:	.asciz "Error opening file\n"
+			.align
+
+Main:
+			ldr r0, =FileName
+			mov r1, #Fmode_r
+			mov r5, #10   ; \n == ASCII 12
+			mov r6, #0x2c   ; ,  == ASCII 54
+			swi SWI_Open
+			blcs PrintErr
+			bl ReadString
+			bl DumpString
+			bl endl
+			bl ChangeString
+			bl DumpString
+			swi SWI_Close
+			swi SWI_Exit
+
+ReadString:	stmdb SP!, {r0,lr}
+			bl Malloc
+			mov r2, #200
+			swi SWI_RdStr
+			mov r2, r1
+			ldmia SP!, {r0,pc}
+
+Malloc:		stmdb SP!, {r0,lr}
+			mov r0, #200
+			swi SWI_Malloc
+			mov r1, r0
+			ldmia SP!, {r0,pc}
+
+ChangeString:	stmdb SP!, {r0,lr}
+				ldrb r4, [r2], #1
+				cmp r4, #0
+				beq ChangeStringRet
+				cmp r4, r6
+				bleq PutEOL
+				bl ChangeString
+ChangeStringRet:ldmia SP!, {r0,pc}
+
+PutEOL:		sub r2, r2, #1
+			strb r5, [r2]
+			add r2, r2, #1
+			bx lr
+
+DumpString: stmdb SP!, {r0,lr}
+			mov r0, r1
+			swi SWI_PrStr
+			ldmia SP!, {r0,pc}
+
+PrintErr:	stmdb SP!, {r0,lr}
+			ldr r0, =FileError
+			swi SWI_PrStr
+			ldmia SP!, {r0,pc}
+endl:		stmdb SP!, {r0,lr}
+			mov r0, #10
+			swi SWI_PrChr
+			ldmia SP!, {r0,pc}

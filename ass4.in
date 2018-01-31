@@ -1,0 +1,35 @@
+.start:
+	ldr r0, =5
+	bl LTimer
+	SWI SWI_Exit
+
+STimer: ; Gives a 1000 clock cycle delay
+    	stmdb SP!, {r0, LR}
+    	ldr r0, =496
+    	nop
+SLoop:
+    	subs r0, r0, #1
+    	bne SLoop
+SRet:
+		ldmia SP!, {r0, PC}
+
+MTimer: ; Gives a 10000 clock cycle delay
+    	stmdb SP!, {r0, LR}
+    	ldr r0, =10
+    	nop
+MLoop:
+		bl STimer
+    	subs r0, r0, #1
+    	bne MLoop
+MRet:
+		ldmia SP!, {r0, PC}
+
+LTimer: ; Gives a 10000 clock cycle delay
+    	stmdb SP!, {r0, LR}
+    	nop
+LLoop:
+		bl MTimer
+    	subs r0, r0, #1
+    	bne LLoop
+LRet:
+		ldmia SP!, {r0, PC}

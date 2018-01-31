@@ -1,15 +1,18 @@
 ; Assignment 3
 
+.data
 FileName:	.asciz "int.txt"
 			.align
 FileError:	.asciz "Error opening file\n"
 			.align
 
-Main:
+.text
+.global .start
+.start:
 			ldr r0, =FileName
 			mov r1, #Fmode_r
 			mov r5, #10   ; \n == ASCII 12
-			mov r6, #0x2c   ; ,  == ASCII 54
+			mov r6, #0x2c ; ,  == ASCII 54
 			swi SWI_Open
 			blcs PrintErr
 			bl ReadString
@@ -40,11 +43,11 @@ ChangeString:	stmdb SP!, {r0,lr}
 				cmp r4, r6
 				bleq PutEOL
 				bl ChangeString
+
 ChangeStringRet:ldmia SP!, {r0,pc}
 
 PutEOL:		sub r2, r2, #1
-			strb r5, [r2]
-			add r2, r2, #1
+			strb r5, [r2], #1
 			bx lr
 
 DumpString: stmdb SP!, {r0,lr}
@@ -56,6 +59,7 @@ PrintErr:	stmdb SP!, {r0,lr}
 			ldr r0, =FileError
 			swi SWI_PrStr
 			ldmia SP!, {r0,pc}
+
 endl:		stmdb SP!, {r0,lr}
 			mov r0, #10
 			swi SWI_PrChr

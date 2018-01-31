@@ -1,27 +1,31 @@
 ; Assignment 1
 
+.data
 FileName:	.asciz "string.txt"
 			.align
 FileError:	.asciz "Error opening file\n"
 			.align
 String:		.asciz "Hello world!\n"
 			.align
+.text
 
 ldr r0, =FileName
 mov r1, #Fmode_w
 swi SWI_Open
 blcs PrintErr
-bl WriteString
+mov r2, #3
+loop:		bl WriteString
+			subs r2, r2, #1
+			bne loop
 swi SWI_Close
 swi SWI_Exit
 
-PrintErr:	stmdb SP!, {r0}
+PrintErr:	stmdb SP!, {r0,lr}
 			ldr r0, =FileError
 			swi SWI_PrStr
-			ldmia SP!, {r0}
-			bx lr
-WriteString:stmdb SP!, {r1}
+			ldmia SP!, {r0,pc}
+
+WriteString:stmdb SP!, {r1,lr}
 			ldr r1, =String
 			swi SWI_WrStr
-			ldmia SP!, {r1}
-			bx lr
+			ldmia SP!, {r1,pc}

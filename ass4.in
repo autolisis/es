@@ -14,7 +14,7 @@ SRet:
 		ldmia SP!, {r0, PC}
 
 MTimer: ; Gives a 10000 clock cycle delay
-    	stmdb SP!, {r0, LR}
+		stmdb SP!, {r0, LR}
     	ldr r0, =10
     	nop
 MLoop:
